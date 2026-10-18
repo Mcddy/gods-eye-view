@@ -1,12 +1,13 @@
-/* ── First-run mission launcher ───────────────────────────────────
-   Compact and non-modal: it gives a new visitor a meaningful starting
-   choice without blocking manual map interaction or spending API quota. */
+/* ── First-run public-signal board ────────────────────────────────
+   A compact mission board over the live globe. The four starts describe the
+   real signal sets they open, so the first decision is about what to inspect,
+   not about learning the panel architecture. */
 #first-run-launcher {
   position: fixed;
   z-index: 175;
   top: 50%;
   left: 50%;
-  width: min(34rem, calc(100vw - 2rem));
+  width: min(50rem, calc(100vw - 2rem));
   /* Five tiles do not fit a short landscape phone (667 x 390), where the card
      would otherwise render past BOTH ends of the viewport. Cap it to the
      viewport and let the mission list scroll inside — the heading, the checkbox
@@ -15,17 +16,17 @@
   max-height: calc(100dvh - 1.5rem);
   display: flex;
   flex-direction: column;
-  padding: 1.15rem;
+  padding: 1.35rem;
   overflow: hidden;
   color: var(--text-primary);
   background:
-    linear-gradient(145deg, rgba(10, 27, 37, 0.97), rgba(7, 13, 22, 0.95)),
-    rgba(7, 17, 25, 0.96);
-  border: 1px solid rgba(54, 220, 255, 0.42);
-  border-radius: 0.65rem;
+    radial-gradient(circle at 12% 0%, rgba(54, 220, 255, 0.1), transparent 34%),
+    linear-gradient(145deg, rgba(8, 23, 32, 0.98), rgba(5, 11, 18, 0.97));
+  border: 1px solid rgba(124, 210, 225, 0.36);
+  border-radius: 0.8rem;
   box-shadow:
     0 1.4rem 4.5rem rgba(0, 0, 0, 0.72),
-    0 0 2.5rem rgba(0, 212, 255, 0.09),
+    0 0 3.2rem rgba(0, 212, 255, 0.08),
     inset 0 0 0 1px rgba(255, 255, 255, 0.025);
   backdrop-filter: blur(28px) saturate(1.25);
   -webkit-backdrop-filter: blur(28px) saturate(1.25);
@@ -56,7 +57,7 @@
 .first-run-scanline {
   position: absolute;
   inset: 0 0 auto;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(
     90deg,
     transparent,
@@ -75,7 +76,7 @@
   gap: 1rem;
   color: rgba(171, 210, 220, 0.6);
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
 }
@@ -84,26 +85,45 @@
   color: rgba(54, 220, 255, 0.86);
 }
 
+.first-run-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: rgba(217, 238, 242, 0.72);
+  letter-spacing: 0.08rem;
+}
+
+.first-run-live > span {
+  width: 0.42rem;
+  height: 0.42rem;
+  background: #64e6b4;
+  border-radius: 50%;
+  box-shadow: 0 0 0.65rem rgba(100, 230, 180, 0.7);
+}
+
 #first-run-launcher h2 {
-  margin-top: 0.6rem;
+  max-width: 34rem;
+  margin-top: 0.72rem;
   font-family: var(--font-mono);
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
-  font-weight: 500;
-  letter-spacing: -0.045rem;
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+  font-weight: 520;
+  line-height: 1.06;
+  letter-spacing: -0.08rem;
 }
 
 #first-run-description {
-  max-width: 29rem;
-  margin-top: 0.3rem;
-  color: rgba(215, 231, 235, 0.66);
-  font-size: 0.78rem;
-  line-height: 1.5;
+  max-width: 37rem;
+  margin-top: 0.48rem;
+  color: rgba(219, 234, 238, 0.76);
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
 .first-run-choices {
   display: grid;
-  gap: 0.42rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 1.15rem;
   /* The one part of the card allowed to scroll when the viewport is too short.
      min-height:0 is what actually lets this flex child shrink below its content. */
   min-height: 0;
@@ -125,18 +145,24 @@
 }
 
 .first-run-choices button {
+  --choice-accent: 54, 220, 255;
+  position: relative;
   display: grid;
-  grid-template-columns: 1.7rem 1fr 1.3rem;
+  grid-column: span 6;
+  grid-template-columns: 2rem minmax(0, 1fr) 1.3rem;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.78rem;
   width: 100%;
-  min-height: 3.55rem;
-  padding: 0.6rem 0.7rem;
+  min-height: 6.2rem;
+  padding: 0.85rem 0.9rem;
+  overflow: hidden;
   color: rgba(225, 244, 248, 0.92);
   text-align: left;
-  background: rgba(29, 69, 81, 0.18);
-  border: 1px solid rgba(100, 200, 220, 0.18);
-  border-radius: 0.42rem;
+  background:
+    linear-gradient(120deg, rgba(var(--choice-accent), 0.11), transparent 72%),
+    rgba(18, 38, 48, 0.42);
+  border: 1px solid rgba(var(--choice-accent), 0.24);
+  border-radius: 0.55rem;
   cursor: pointer;
   transition:
     background var(--transition-fast),
@@ -144,10 +170,33 @@
     transform var(--transition-fast);
 }
 
+.first-run-choices button::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: rgba(var(--choice-accent), 0.78);
+  box-shadow: 0 0 1rem rgba(var(--choice-accent), 0.45);
+}
+
+.first-run-choices button[data-first-run-choice='space-missions'] {
+  --choice-accent: 168, 142, 255;
+}
+
+.first-run-choices button[data-first-run-choice='environmental'] {
+  --choice-accent: 238, 169, 83;
+}
+
+.first-run-choices button[data-first-run-choice='explore'] {
+  --choice-accent: 151, 177, 187;
+}
+
 .first-run-choices button:hover,
 .first-run-choices button:focus-visible {
-  background: rgba(25, 151, 178, 0.16);
-  border-color: rgba(54, 220, 255, 0.62);
+  background:
+    linear-gradient(120deg, rgba(var(--choice-accent), 0.18), transparent 72%),
+    rgba(20, 47, 59, 0.62);
+  border-color: rgba(var(--choice-accent), 0.72);
   outline: none;
   transform: translateX(2px);
 }
@@ -161,31 +210,42 @@
   pointer-events: none;
 }
 
-.first-run-choices button > .material-symbols-outlined:first-child {
-  color: #55dff5;
-  font-size: 1.35rem;
+.first-run-choice-icon {
+  color: rgb(var(--choice-accent));
+  font-size: 1.55rem;
+  text-shadow: 0 0 1rem rgba(var(--choice-accent), 0.38);
 }
 
-.first-run-choices button > span:nth-child(2) {
+.first-run-choice-copy {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.22rem;
+  min-width: 0;
 }
 
 .first-run-choices strong {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 600;
   letter-spacing: 0.08rem;
 }
 
 .first-run-choices small {
-  color: rgba(198, 220, 226, 0.55);
-  font-size: 0.66rem;
+  color: rgba(211, 230, 235, 0.78);
+  font-size: 0.7rem;
+  line-height: 1.42;
+}
+
+.first-run-choice-source {
+  margin-top: 0.18rem;
+  color: rgba(var(--choice-accent), 0.78);
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.055rem;
 }
 
 .first-run-arrow {
-  color: rgba(54, 220, 255, 0.4);
+  color: rgba(var(--choice-accent), 0.56);
   font-size: 1rem;
   transition:
     transform var(--transition-fast),
@@ -194,18 +254,20 @@
 
 .first-run-choices button:hover .first-run-arrow,
 .first-run-choices button:focus-visible .first-run-arrow {
-  color: rgba(54, 220, 255, 0.9);
+  color: rgba(var(--choice-accent), 0.95);
   transform: translateX(2px);
 }
 
 /* Ordered after the shared button rule rather than shouting !important at it. */
 .first-run-choices button.first-run-explore {
-  background: rgba(255, 255, 255, 0.025);
+  background:
+    linear-gradient(120deg, rgba(var(--choice-accent), 0.07), transparent 72%),
+    rgba(255, 255, 255, 0.018);
 }
 
 .first-run-footer {
   margin-top: 0.85rem;
-  font-size: 0.48rem;
+  font-size: 0.58rem;
   letter-spacing: 0.055rem;
 }
 
@@ -280,11 +342,13 @@ body.scene-playback-mode #first-run-launcher {
     font-size: 0.72rem;
   }
   .first-run-choices {
+    grid-template-columns: 1fr;
     margin-top: 0.75rem;
   }
   .first-run-choices button {
-    min-height: 3rem;
-    padding: 0.45rem 0.6rem;
+    grid-column: 1;
+    min-height: 4.65rem;
+    padding: 0.62rem 0.68rem;
   }
   .first-run-choices small {
     font-size: 0.62rem;
@@ -295,10 +359,8 @@ body.scene-playback-mode #first-run-launcher {
 }
 
 /* Short viewports — landscape phones, small laptop windows. The chrome tightens
-   so the mission list keeps a usable share of the height. The intro line STAYS:
-   it is the only copy that says what this thing is, and with four tiles it
-   fits. (It was dropped here while there were five; the tile that went is
-   exactly why it can come back.) */
+   so the mission list keeps a usable share of the height. The owner-authored
+   intro line stays because it is the only copy that explains the premise. */
 @media (max-height: 620px) {
   #first-run-launcher {
     padding: 0.75rem 0.85rem;
@@ -316,14 +378,17 @@ body.scene-playback-mode #first-run-launcher {
     margin-top: 0.55rem;
   }
   .first-run-choices button {
-    min-height: 2.7rem;
-    padding: 0.36rem 0.6rem;
+    min-height: 4.15rem;
+    padding: 0.48rem 0.62rem;
   }
   .first-run-choices strong {
     font-size: 0.68rem;
   }
   .first-run-choices small {
-    font-size: 0.6rem;
+    font-size: 0.64rem;
+  }
+  .first-run-choice-source {
+    display: none;
   }
   .first-run-footer {
     margin-top: 0.5rem;
